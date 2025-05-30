@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive AI Content Strategy Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Visualization & Content Choices: 
+        - Executive Summary: Key textual points. Goal: Inform.
+        - Evolving Landscape: Textual summary. Goal: Inform.
+        - Target Audience (Table 1): Interactive HTML table (filter by Persona, Knowledge Level) + Chart.js Bar Chart (Knowledge Level Distribution). Goal: Compare, Inform. Justification: Table for detail, chart for quick overview.
+        - Core Content Pillars Overview: Chart.js Donut Chart (Pillar breadth by topic clusters). Goal: Inform. Justification: Visual summary of pillar focus.
+        - Core Content Pillars (Table 2 data): Accordion for each of the 5 main pillars (Foundations, ML, Prompt Eng, AI in Practice, Curated Resources). Each accordion reveals topic clusters, article/tutorial ideas. Goal: Organize, Inform. Justification: Manages dense information effectively.
+        - Learning Resources (Table 3, within 'Curated Resources' Pillar): Interactive HTML table (filter by Resource Type). Goal: Compare. Justification: Easy resource comparison.
+        - Ethical AI: Textual summaries. Goal: Inform.
+        - SEO Keywords (Table 4, within 'Optimization' section): Interactive HTML table (filter by Primary Theme). Goal: Organize, Inform. Justification: Easy exploration of SEO strategy.
+        - UX, Engagement, Sustaining Excellence, Conclusion: Textual summaries. Goal: Inform.
+        - All interactions use Vanilla JS. All charts use Chart.js.
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar { background-color: #334155; /* slate-700 */ }
+        .sidebar-link { transition: all 0.3s ease; }
+        .sidebar-link.active, .sidebar-link:hover { background-color: #0ea5e9; /* sky-500 */ color: white; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .table-filter-button.active { background-color: #38bdf8; /* sky-400 */ color: white; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .accordion-button.open + .accordion-content { max-height: 3000px; /* Adjusted for potentially long content */ }
+        .table th, .table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb; /* stone-200 */ }
+        .table th { background-color: #f5f5f4; /* stone-100 */ font-weight: 600; }
+        .table tr:hover { background-color: #e7e5e4; /* stone-200 */ }
+        .filter-input { border: 1px solid #d6d3d1; /* stone-300 */ padding: 0.5rem; border-radius: 0.375rem; }
+        .content-card { background-color: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); }
+        h2, h3, h4 { color: #1e3a8a; /* blue-800 */ }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 flex min-h-screen">
+
+    <aside class="sidebar w-72 text-stone-100 p-6 space-y-4 fixed h-full overflow-y-auto">
+        <h1 class="text-2xl font-semibold text-sky-400 mb-6">AI Strategy Explorer</h1>
+        <nav>
+            <ul class="space-y-1">
+                <li><a href="#summary" class="sidebar-link block py-2.5 px-4 rounded-md active">I. Executive Summary</a></li>
+                <li><a href="#defining" class="sidebar-link block py-2.5 px-4 rounded-md">II. Defining AI Companion</a></li>
+                <li><a href="#pillars" class="sidebar-link block py-2.5 px-4 rounded-md">III. Core Content Pillars</a></li>
+                <li><a href="#ethical" class="sidebar-link block py-2.5 px-4 rounded-md">IV. Ethical AI Content</a></li>
+                <li><a href="#optimization" class="sidebar-link block py-2.5 px-4 rounded-md">V. Content Optimization</a></li>
+                <li><a href="#sustaining" class="sidebar-link block py-2.5 px-4 rounded-md">VI. Sustaining Excellence</a></li>
+                <li><a href="#conclusion" class="sidebar-link block py-2.5 px-4 rounded-md">VII. Conclusion</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="ml-72 flex-1 p-6 md:p-10 overflow-y-auto">
+        
+        <section id="summary" class="content-section active space-y-6">
+            <h2 class="text-3xl font-bold border-b-2 border-sky-200 pb-2">I. Executive Summary: Charting the Course</h2>
+            <p class="text-lg text-stone-700 leading-relaxed">This section provides a high-level overview of the comprehensive content strategy for the "AI Companion" website. It outlines the strategy's purpose, its foundational pillars, and the anticipated outcomes from its successful implementation, aiming to establish the website as a premier resource in the AI domain.</p>
+            
+            <div class="content-card space-y-4">
+                <h3 class="text-xl font-semibold">A. Purpose of the Content Strategy</h3>
+                <p>To establish the "AI Companion" website as a premier, authoritative, and comprehensive resource for individuals seeking to understand, effectively utilize, and remain current with the rapidly evolving landscape of AI companions and associated artificial intelligence technologies. The core is high-quality, educational, and engaging content for a diverse audience.</p>
+                
+                <h3 class="text-xl font-semibold">B. Key Strategic Pillars</h3>
+                <p>The strategy is built upon: Foundations of AI, Unveiling Machine Learning, Mastering Prompt Engineering, AI in Practice, and Curated AI Learning Resources. These are underpinned by commitments to ethical AI, SEO, and exceptional UX.</p>
+                
+                <h3 class="text-xl font-semibold">C. Expected Outcomes</h3>
+                <p>Positioning as a thought leader, attracting and retaining a diverse user base, increasing organic traffic, and cultivating a vibrant AI learning community, making the website the definitive destination for AI companion information.</p>
+            </div>
+        </section>
+
+        <section id="defining" class="content-section space-y-6">
+            <h2 class="text-3xl font-bold border-b-2 border-sky-200 pb-2">II. Defining the AI Companion: Purpose, Audience, and Value</h2>
+            <p class="text-lg text-stone-700 leading-relaxed">This section delves into the evolving nature of AI companions, their capabilities, and user expectations. It also provides a detailed breakdown of the target audience segments for the AI Companion website, crucial for tailoring content effectively. You can interact with the audience table below.</p>
+
+            <div class="content-card space-y-4">
+                <h3 class="text-xl font-semibold">A. The Evolving Landscape of AI Companions</h3>
+                <p>AI Companions have broadened from simple assistants to tools for emotional support (e.g., Replika) and productivity enhancement (e.g., Microsoft Copilot). This duality means the website must cater to diverse user needs, focusing on personalization, the evolving human-AI relationship, and staying current with rapid technological advancements. The "relationship" aspect and data "memory" are key themes, raising ethical considerations.</p>
+            </div>
+            
+            <div class="content-card space-y-4">
+                <h3 class="text-xl font-semibold">B. Identifying and Understanding Your Target Audience</h3>
+                <p class="mb-4">The table below outlines key audience personas, their AI knowledge levels, motivations, preferred content, and potential pain points. Use the filter to narrow down segments.</p>
+                <div class="mb-4 flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div class="flex-1">
+                        <label for="audienceKnowledgeFilter" class="block text-sm font-medium text-stone-700 mb-1">Filter by AI Knowledge Level:</label>
+                        <select id="audienceKnowledgeFilter" class="filter-input w-full">
+                            <option value="all">All Knowledge Levels</option>
+                            </select>
+                    </div>
+                    <div class="flex-1">
+                         <label for="audiencePersonaFilter" class="block text-sm font-medium text-stone-700 mb-1">Filter by Persona Name:</label>
+                        <select id="audiencePersonaFilter" class="filter-input w-full">
+                            <option value="all">All Personas</option>
+                            </select>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table id="audienceTable" class="w-full table">
+                        <thead>
+                            <tr>
+                                <th>Persona Name</th>
+                                <th>AI Knowledge Level</th>
+                                <th>Key Motivations</th>
+                                <th>Preferred Content Types</th>
+                                <th>Potential Pain Points</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3 class="text-xl font-semibold mb-3">Audience AI Knowledge Distribution</h3>
+                <p class="mb-4">This chart visualizes the general distribution of AI knowledge levels among the target audience segments, helping to guide content depth and accessibility.</p>
+                <div class="chart-container">
+                    <canvas id="audienceKnowledgeChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="pillars" class="content-section space-y-6">
+            <h2 class="text-3xl font-bold border-b-2 border-sky-200 pb-2">III. Core Content Pillars: Educating and Engaging Users</h2>
+            <p class="text-lg text-stone-700 leading-relaxed">The website's content is structured around five key pillars, each addressing a specific facet of AI. This ensures comprehensive coverage and helps users navigate to topics of interest. Explore the chart for an overview and expand each pillar below for detailed topic clusters and sample content ideas. Table 3 (Learning Resources) is integrated within the "Curated AI Resources" pillar accordion.</p>
+
+            <div class="content-card">
+                <h3 class="text-xl font-semibold mb-3">Content Pillars Overview (by Topic Clusters)</h3>
+                 <p class="mb-4">This chart illustrates the relative focus of each content pillar, measured by the number of distinct topic clusters identified within them. This provides a visual guide to the breadth of coverage planned for each core area.</p>
+                <div class="chart-container" style="max-height: 450px; height: 40vh;">
+                    <canvas id="pillarsChart"></canvas>
+                </div>
+            </div>
+            
+            <div id="pillarsAccordion" class="space-y-4">
+                </div>
+        </section>
+        
+        <section id="ethical" class="content-section space-y-6">
+            <h2 class="text-3xl font-bold border-b-2 border-sky-200 pb-2">IV. Ethical AI Content: Guiding Principles for Responsible Information</h2>
+            <p class="text-lg text-stone-700 leading-relaxed">This section details the website's commitment to addressing key ethical challenges in AI—such as bias, fairness, accountability, and transparency—and outlines guidelines for developing all content with ethical AI use in mind. Educating users on these principles is vital as AI becomes more integrated into our lives.</p>
+
+            <div class="content-card space-y-4">
+                <h3 class="text-xl font-semibold">A. Addressing Bias, Fairness, Accountability, and Transparency</h3>
+                <p>Dedicated content will explain:
+                    <ul class="list-disc list-inside space-y-1 mt-2 text-stone-600">
+                        <li><strong>Defining AI Bias:</strong> How AI systems can produce prejudiced results due to algorithmic, data, or human biases.</li>
+                        <li><strong>Understanding Fairness:</strong> Equitable treatment beyond simple accuracy, including concepts like demographic parity.</li>
+                        <li><strong>Ensuring Accountability:</strong> Who is responsible when AI systems err or cause harm.</li>
+                        <li><strong>Promoting Transparency and Explainability (XAI):</strong> The importance of understanding AI decision-making processes.</li>
+                    </ul>
+                </p>
+                <p>The unique ethical nuances of AI companions (data privacy, emotional dependency, echo chambers) will also be explored specifically.</p>
+            </div>
+            <div class="content-card">
+                <h3 class="text-xl font-semibold">B. Developing Content with Ethical AI Use in Mind</h3>
+                <p class="mb-2">Internal guidelines will ensure all content promotes responsible AI. Key aspects include:</p>
+                <ul class="list-disc list-inside space-y-1 text-stone-600">
+                    <li>Using inclusive language and diverse examples.</li>
+                    <li>Acknowledging limitations, inaccuracies, and risks of AI tools.</li>
+                    <li>Avoiding hype and sensationalism; presenting AI capabilities factually.</li>
+                    <li>Rigorous fact-checking and source attribution.</li>
+                    <li>Promoting critical thinking about AI-generated information.</li>
+                    <li>Adhering to core principles like transparency and explainability.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="optimization" class="content-section space-y-6">
+            <h2 class="text-3xl font-bold border-b-2 border-sky-200 pb-2">V. Content Optimization: Discoverability and User Engagement</h2>
+            <p class="text-lg text-stone-700 leading-relaxed">This section details strategies for Search Engine Optimization (SEO) to ensure content discoverability, User Experience (UX) design principles for intuitive interaction, and methods for fostering user engagement and community. Explore the SEO keyword clusters in the interactive table below.</p>
+
+            <div class="content-card space-y-4">
+                <h3 class="text-xl font-semibold">A. Strategic SEO for AI Educational Content</h3>
+                <p class="mb-4">A robust SEO strategy is vital for discoverability. This involves keyword research, understanding user intent, and on-page optimization. The table below (Table 4 from the report) shows example keyword clusters. Use the filter to explore themes.</p>
+                <div class="mb-4">
+                    <label for="seoKeywordFilter" class="block text-sm font-medium text-stone-700 mb-1">Filter by Primary Keyword Theme:</label>
+                    <select id="seoKeywordFilter" class="filter-input w-full md:w-1/2">
+                        <option value="all">All Themes</option>
+                        </select>
+                </div>
+                <div class="overflow-x-auto">
+                    <table id="seoKeywordsTable" class="w-full table">
+                        <thead>
+                            <tr>
+                                <th>Primary Keyword Theme</th>
+                                <th>Long-Tail Keyword Examples</th>
+                                <th>Question-Based Keyword Examples</th>
+                                <th>Target Content Pillar(s)</th>
+                                <th>Search Intent</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="content-card">
+                    <h3 class="text-xl font-semibold mb-3">B. Designing for User Experience (UX)</h3>
+                    <p class="mb-2">A superior UX is critical for presenting complex AI topics. Key principles include:</p>
+                    <ul class="list-disc list-inside space-y-1 text-stone-600">
+                        <li>Clear Site Structure & Intuitive Navigation</li>
+                        <li>Readability (typography, chunking, headings)</li>
+                        <li>Visual Aids (meaningful, with text alternatives - WCAG)</li>
+                        <li>Glossary of Terms</li>
+                        <li>Consistent Terminology</li>
+                        <li>Mobile-Friendliness & Page Speed</li>
+                    </ul>
+                </div>
+                 <div class="content-card">
+                    <h3 class="text-xl font-semibold mb-3">C. Fostering User Engagement</h3>
+                    <p class="mb-2">Strategies to transform passive readers into active learners:</p>
+                    <ul class="list-disc list-inside space-y-1 text-stone-600">
+                        <li><strong>Interactive Content:</strong> Quizzes, knowledge checks, simple simulators/labs.</li>
+                        <li><strong>Community Building:</strong> Comment sections, forums, Q&A sections.</li>
+                        <li>User-Generated Content (Future Consideration).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="sustaining" class="content-section space-y-6">
+            <h2 class="text-3xl font-bold border-b-2 border-sky-200 pb-2">VI. Sustaining Excellence: Content Curation, Updates, and Future Growth</h2>
+            <p class="text-lg text-stone-700 leading-relaxed">The AI field evolves rapidly. This section discusses strategies for maintaining content currency through regular audits and updates, monitoring website performance, and integrating user feedback to ensure long-term relevance and growth.</p>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="content-card">
+                    <h3 class="text-xl font-semibold">A. Content Refresh Cadence & New Topic Integration</h3>
+                    <p>A systematic content refresh cadence is crucial. This includes regular audits for accuracy, scheduled updates (quarterly/annually based on topic volatility), version control for significant shifts, and a process for integrating emerging AI trends, new companion releases, research breakthroughs, and ethical debates.</p>
+                </div>
+                <div class="content-card">
+                    <h3 class="text-xl font-semibold">B. Monitoring Performance and Iterating Based on User Feedback</h3>
+                    <p>Success is measured by user value. This involves robust analytics tracking (page views, time on page, keyword rankings) and active solicitation of user feedback through comments, contact forms, surveys, and forums. This data will inform iterative improvements to content and UX.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="conclusion" class="content-section space-y-6">
+            <h2 class="text-3xl font-bold border-b-2 border-sky-200 pb-2">VII. Conclusion: Building a Premier AI Companion Knowledge Hub</h2>
+            <p class="text-lg text-stone-700 leading-relaxed">This final section summarizes the key strategic recommendations and outlines the future vision for the AI Companion website as a leading resource in the artificial intelligence domain.</p>
+
+            <div class="content-card space-y-4">
+                <h3 class="text-xl font-semibold">A. Summary of Strategic Recommendations</h3>
+                 <ul class="list-disc list-inside space-y-1 text-stone-600">
+                    <li>Broad and inclusive definition of AI companions.</li>
+                    <li>Robust educational pillars (AI Foundations, ML, Prompt Engineering).</li>
+                    <li>Emphasis on practical "AI in Practice" tutorials.</li>
+                    <li>Curated guidance on AI books, courses, and tools.</li>
+                    <li>Unwavering commitment to ethical AI principles.</li>
+                    <li>Continuous optimization (SEO, UX), community engagement, and content currency.</li>
+                </ul>
+            </div>
+            <div class="content-card">
+                <h3 class="text-xl font-semibold">B. The Future Vision for the AI Companion Website</h3>
+                <p>To become the definitive, trusted, and most engaging online resource for individuals seeking to understand, utilize, and critically engage with AI companions and the broader world of AI. The aim is to cultivate an informed, empowered global community, fostering a deeper appreciation for AI's potential to augment human capabilities and positively shape the future.</p>
+            </div>
+        </section>
+
+    </main>
+
+<script>
+    // Data extracted from "A Comprehensive Content Strategy for the AI Companion Website"
+    const audienceData = [
+        { name: "AI Curious Beginner", knowledge: "None to Basic", motivations: "Understand AI basics, learn what AI companions are, explore potential uses, satisfy curiosity.", content: "Simple articles, clear definitions, beginner guides, everyday examples, video explainers.", pain: "AI jargon is confusing, overwhelmed by technical details, unsure where to start." },
+        { name: "Productivity Seeker", knowledge: "Basic to Intermediate", motivations: "Find tools to improve work/personal efficiency, automate tasks, manage information better.", content: "How-to guides, tool reviews, tutorials on specific AI companion features, case studies.", pain: "Too busy for complex tools, needs quick solutions, concerned about data privacy with tools." },
+        { name: "Aspiring AI Developer/Hobbyist", knowledge: "Intermediate to Advanced", motivations: "Learn how AI companions are built, explore ML concepts, learn prompt engineering, find project ideas.", content: "Technical tutorials, coding examples, deep dives into algorithms, advanced guides.", pain: "Lack of practical coding experience, difficulty finding advanced but clear resources." },
+        { name: "Ethical AI Advocate", knowledge: "Any", motivations: "Understand ethical implications of AI, data privacy, bias in AI, responsible AI development.", content: "In-depth ethical discussions, articles on AI governance, expert opinions, case studies.", pain: "Concerns about AI misuse, lack of transparency, impact of AI on society." },
+        { name: "Academic/Researcher", knowledge: "Advanced", motivations: "Stay updated on latest AI research, find specific technical information, explore new models.", content: "Research paper summaries, links to academic sources, technical deep dives, expert interviews.", pain: "Access to paywalled research, finding niche information quickly." }
+    ];
+
+    // Simplified structure for pillar descriptions; detailed content comes from Table 2.
+    const pillarOverviews = [
+        { name: "Foundations of AI", description: "Provides a solid entry point into AI, covering basic concepts, history, types of AI, and core terminology. Essential for beginners." },
+        { name: "Unveiling Machine Learning", description: "Explores Machine Learning in depth, including its types (supervised, unsupervised, reinforcement), common algorithms, and real-world applications." },
+        { name: "Mastering Prompt Engineering", description: "A cornerstone pillar focused on crafting effective prompts for LLMs and generative AI, covering best practices and advanced techniques." },
+        { name: "AI in Practice", description: "Focuses on practical application with tutorials for everyday tasks, beginner-friendly AI projects (no-code and Python-based), and leveraging pre-trained models." },
+        { name: "Curated AI Learning Resources", description: "Acts as a navigational aid, offering reviews and recommendations for AI books, online courses, and development tools. Includes an interactive table of resources." }
+    ];
+
+    // Data from Table 2: Core Content Pillar Breakdown
+    const contentPillarDetails = [
+        { 
+            pillarName: "Foundations of AI",
+            clusters: [
+                { name: "Intro to AI & History", articles: ["What is AI? Demystifying Artificial Intelligence", "AI History: From Turing to Transformers"], tutorials: ["Timeline of AI: Interactive Guide"], audience: "AI Curious Beginner" },
+                { name: "Core AI Concepts (ML, DL, NN)", articles: ["Machine Learning vs. Deep Learning vs. Neural Networks: The Plain English Guide"], tutorials: ["Understanding Neural Networks: A Visual Primer"], audience: "AI Curious Beginner, Productivity Seeker" },
+                { name: "Types of AI (ANI, AGI, ASI)", articles: ["ANI, AGI, ASI: Understanding the Spectrum of AI Capabilities"], tutorials: ["Quiz: Which Type of AI Are You Interacting With?"], audience: "AI Curious Beginner, Ethical AI Advocate" }
+            ]
+        },
+        { 
+            pillarName: "Unveiling Machine Learning",
+            clusters: [
+                { name: "Intro to Machine Learning", articles: ["Machine Learning Explained: How Computers Learn from Data"], tutorials: ["Your First ML Concept: Supervised Learning Walkthrough"], audience: "AI Curious Beginner, Productivity Seeker" },
+                { name: "Types of ML (Supervised, Unsupervised, Reinforcement)", articles: ["Supervised vs. Unsupervised vs. Reinforcement Learning: Key Differences & Uses"], tutorials: ["Unsupervised Learning in Action: A Clustering Example"], audience: "Productivity Seeker, Aspiring AI Developer" },
+                { name: "Common ML Algorithms", articles: ["Linear Regression & Decision Trees: Your First Look at ML Algorithms"], tutorials: ["K-Means Clustering: A Step-by-Step Visual Guide"], audience: "Aspiring AI Developer" }
+            ]
+        },
+        { 
+            pillarName: "Mastering Prompt Engineering",
+            clusters: [
+                { name: "Intro to Prompt Engineering", articles: ["Prompt Engineering: The Key to Unlocking LLM Potential"], tutorials: ["Anatomy of a Perfect Prompt: Elements & Examples"], audience: "Productivity Seeker, Aspiring AI Developer, Ethical AI Advocate" },
+                { name: "Prompting Best Practices & Basic Techniques", articles: ["10 Tips for Writing Prompts That Get Results", "Zero-Shot vs. Few-Shot Prompting"], tutorials: ["Interactive Prompt Lab: Test Your Basic Prompting Skills"], audience: "All Segments" },
+                { name: "Advanced Prompting Techniques", articles: ["Beyond Basic Prompts: Exploring Chain-of-Thought and Tree-of-Thought"], tutorials: ["Advanced Prompting Workshop: CoT & Self-Consistency"], audience: "Aspiring AI Developer, Academic/Researcher" },
+                { name: "Prompting for Image Generation", articles: ["Crafting Visuals: A Guide to Prompting DALL-E, Midjourney & Stable Diffusion"], tutorials: ["Image Prompt Cheatsheet: Styles, Lighting & Composition"], audience: "Productivity Seeker, Aspiring AI Developer" }
+            ]
+        },
+        { 
+            pillarName: "AI in Practice",
+            clusters: [
+                { name: "AI for Everyday Tasks", articles: ["Boost Your Productivity: 20 Ways AI Can Help You Today"], tutorials: ["Automate Your Inbox: An AI Email Management Tutorial"], audience: "Productivity Seeker" },
+                { name: "Beginner No-Code AI Projects", articles: ["Build an AI Model in Minutes: Your First Teachable Machine Project"], tutorials: ["Teachable Machine: Image Classification Step-by-Step"], audience: "AI Curious Beginner, Productivity Seeker" },
+                { name: "Beginner Coding AI Projects (Python)", articles: ["Your First Python AI Project: Sentiment Analysis of Movie Reviews"], tutorials: ["Sentiment Analysis with Python & TextBlob: A Beginner's Code-Along"], audience: "Aspiring AI Developer" },
+                { name: "Using Pre-trained Models (Hugging Face)", articles: ["Hugging Face Transformers: Accessing Thousands of AI Models Easily"], tutorials: ["Tutorial: Sentiment Analysis with Hugging Face `pipeline()`"], audience: "Aspiring AI Developer" }
+            ]
+        },
+        { 
+            pillarName: "Curated AI Learning Resources", // This pillar will also contain Table 3
+            clusters: [
+                { name: "AI Book Reviews", articles: ["Top 5 AI Books for Beginners in 2025", "Essential Reads on AI Ethics"], tutorials: ["Book Comparison: 'AI: A Modern Approach' vs. 'Deep Learning for Coders'"], audience: "All Segments" },
+                { name: "AI Course & Platform Reviews", articles: ["Best Online Courses to Learn AI and Machine Learning in 2025"], tutorials: ["Coursera vs. Udacity vs. edX for AI: Which is Right for You?"], audience: "All Segments" },
+                { name: "AI Tool Reviews", articles: ["AI Coding Assistants: GitHub Copilot vs. Amazon CodeWhisperer"], tutorials: ["Getting Started with Google Teachable Machine: A Tool Review"], audience: "Productivity Seeker, Aspiring AI Developer" }
+            ]
+        }
+    ];
+    
+    // Data from Table 3: Comparison of Key AI Learning Resources
+    const learningResourcesData = [
+        { type: "Book", name: "Artificial Intelligence: A Modern Approach (4th Ed.)", description: "Comprehensive textbook covering a wide range of AI topics.", bestFor: "AI Fundamentals, Academic Study", features: "Authoritative, extensive coverage.", cons: "Very dense, requires math/CS background.", price: "One-time Purchase" },
+        { type: "Book", name: "Deep Learning for Coders with fastai and PyTorch", description: "Practical, code-first approach to learning deep learning.", bestFor: "Practical ML Skills, Coders", features: "Hands-on, examples first, covers vision, NLP.", cons: "Assumes programming experience.", price: "One-time Purchase" },
+        { type: "Book", name: "The Alignment Problem: Machine Learning and Human Values", description: "Explores challenges of ensuring AI systems align with human intentions and ethics.", bestFor: "AI Ethics, Societal Impact", features: "Thought-provoking, real-world examples.", cons: "Can be philosophically dense.", price: "One-time Purchase" },
+        { type: "Course", name: "Coursera: AI For Everyone (Andrew Ng, DeepLearning.AI)", description: "Beginner-friendly overview of AI, its applications, and impact.", bestFor: "AI Fundamentals for Non-Technical Audience", features: "Clear explanations, covers AI strategy, no coding.", cons: "Less technical depth for engineers.", price: "Subscription/Audit" },
+        { type: "Course", name: "Coursera: Machine Learning Specialization (Andrew Ng, Stanford)", description: "Foundational program on ML with Python.", bestFor: "ML Practical Skills, Aspiring ML Engineers", features: "Taught by Andrew Ng, Python-based, real-world applications.", cons: "Requires time commitment.", price: "Subscription" },
+        { type: "Course", name: "Coursera: Google AI Essentials", description: "Self-paced program on using AI tools for productivity, prompt engineering.", bestFor: "Practical AI Application, Non-Technical Users", features: "Hands-on, uses Gemini, covers AI ethics.", cons: "Focus on using tools, not building.", price: "Subscription" },
+        { type: "Course", name: "edX: CS50's Introduction to Artificial Intelligence with Python", description: "Harvard course exploring foundational AI concepts with Python.", bestFor: "AI Fundamentals with Coding", features: "Covers search, classification, ML, NLP; strong academic backing.", cons: "Intensive (10-30 hours/week).", price: "Audit Free/Certificate" },
+        { type: "Tool", name: "Google Teachable Machine", description: "Web-based tool for creating ML models without coding.", bestFor: "No-Code AI, Quick Prototyping", features: "Fast, easy, accessible, exports TensorFlow.js models.", cons: "Limited complexity for advanced models.", price: "Free" },
+        { type: "Tool", name: "Hugging Face Transformers", description: "Python library for pre-trained models (NLP, vision, audio).", bestFor: "Using Pre-trained Models, NLP Applications", features: "Easy access to SOTA models, `pipeline()` for quick use.", cons: "Resource-intensive for large models.", price: "Open Source (Free)" },
+        { type: "Tool", name: "GitHub Copilot", description: "AI pair programmer providing real-time code suggestions.", bestFor: "AI Coding Assistance, Developer Productivity", features: "Context-aware suggestions, supports multiple languages.", cons: "Occasional incorrect suggestions, subscription cost.", price: "Subscription" }
+    ];
+
+    // Data from Table 4: SEO Keyword Clusters
+    const seoKeywordsData = [
+        { theme: "AI Fundamentals", longTail: "\"what is artificial narrow intelligence,\" \"benefits of artificial intelligence in daily life\"", question: "\"What are the 3 types of AI?,\" \"How did AI start?\"", pillars: "Foundations of AI", intent: "Informational" },
+        { theme: "Learn Machine Learning", longTail: "\"supervised vs unsupervised learning examples,\" \"linear regression for beginners python\"", question: "\"How does machine learning work?,\" \"What are common machine learning algorithms?\"", pillars: "Unveiling ML, AI in Practice", intent: "Informational, Transactional" },
+        { theme: "Prompt Engineering Tutorial", longTail: "\"how to write effective chatgpt prompts,\" \"chain of thought prompting tutorial\"", question: "\"What is a good prompt for image generation?,\" \"How can I improve my AI prompts?\"", pillars: "Mastering Prompt Engineering, AI in Practice", intent: "Informational, Transactional" },
+        { theme: "AI Companion Benefits", longTail: "\"emotional support ai companion review,\" \"using ai companion for productivity at work\"", question: "\"What can an AI companion do?,\" \"Are AI companions safe?\"", pillars: "Defining AI Companion, Ethical AI, Curated Resources", intent: "Informational, Commercial" },
+        { theme: "Ethical AI", longTail: "\"how to prevent ai bias in algorithms,\" \"data privacy concerns with ai\"", question: "\"What are the ethical issues in AI?,\" \"How can AI be fair?\"", pillars: "Ethical AI Content", intent: "Informational" },
+        { theme: "AI Tools & Courses", longTail: "\"best online course for ai beginners,\" \"github copilot vs amazon codewhisperer review\"", question: "\"Which AI course should I take?,\" \"What are the top AI development tools?\"", pillars: "Curated AI Resources", intent: "Commercial, Transactional" },
+        { theme: "Practical AI Applications", longTail: "\"ai for email organization tutorial,\" \"no-code ai image classification\"", question: "\"How can AI help with data analysis?,\" \"What are some simple AI projects for beginners?\"", pillars: "AI in Practice", intent: "Informational, Transactional" }
+    ];
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+        const contentSections = document.querySelectorAll('.content-section');
+        
+        const audienceTableBody = document.querySelector('#audienceTable tbody');
+        const audienceKnowledgeFilter = document.getElementById('audienceKnowledgeFilter');
+        const audiencePersonaFilter = document.getElementById('audiencePersonaFilter');
+        const audienceKnowledgeChartCtx = document.getElementById('audienceKnowledgeChart')?.getContext('2d');
+        let audienceChartInstance;
+
+        const pillarsAccordionContainer = document.getElementById('pillarsAccordion');
+        const pillarsChartCtx = document.getElementById('pillarsChart')?.getContext('2d');
+        let pillarChartInstance;
+        
+        const resourcesTableBody = document.querySelector('#resourcesTable tbody'); // Will be created dynamically
+        const resourceTypeFilter = document.getElementById('resourceTypeFilter'); // Will be created dynamically
+
+        const seoKeywordsTableBody = document.querySelector('#seoKeywordsTable tbody');
+        const seoKeywordFilter = document.getElementById('seoKeywordFilter');
+
+        // Navigation
+        function updateActiveSection() {
+            const hash = window.location.hash || '#summary'; // Default to summary
+            sidebarLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === hash);
+            });
+            contentSections.forEach(section => {
+                section.classList.toggle('active', section.id === hash.substring(1));
+            });
+            window.scrollTo(0, 0);
+        }
+
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                // Default behavior updates hash, then hashchange listener updates content
+            });
+        });
+        window.addEventListener('hashchange', updateActiveSection);
+        updateActiveSection(); // Initial call
+
+        // Populate Audience Table & Filters
+        function populateAudienceFilters() {
+            const knowledgeLevels = [...new Set(audienceData.map(item => item.knowledge))];
+            knowledgeLevels.forEach(level => {
+                const option = document.createElement('option');
+                option.value = level;
+                option.textContent = level;
+                audienceKnowledgeFilter.appendChild(option);
+            });
+            const personaNames = [...new Set(audienceData.map(item => item.name))];
+            personaNames.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                audiencePersonaFilter.appendChild(option);
+            });
+        }
+
+        function populateAudienceTable() {
+            const knowledgeFilter = audienceKnowledgeFilter.value;
+            const personaFilter = audiencePersonaFilter.value;
+            audienceTableBody.innerHTML = '';
+            
+            const filteredData = audienceData.filter(segment => {
+                const knowledgeMatch = (knowledgeFilter === 'all' || segment.knowledge === knowledgeFilter);
+                const personaMatch = (personaFilter === 'all' || segment.name === personaFilter);
+                return knowledgeMatch && personaMatch;
+            });
+
+            filteredData.forEach(segment => {
+                const row = audienceTableBody.insertRow();
+                row.innerHTML = `
+                    <td class="py-2 px-3 text-sm">${segment.name}</td>
+                    <td class="py-2 px-3 text-sm">${segment.knowledge}</td>
+                    <td class="py-2 px-3 text-sm">${segment.motivations}</td>
+                    <td class="py-2 px-3 text-sm">${segment.content}</td>
+                    <td class="py-2 px-3 text-sm">${segment.pain}</td>
+                `;
+            });
+        }
+        
+        function updateAudienceKnowledgeChart() {
+            if (!audienceKnowledgeChartCtx) return;
+            const knowledgeCounts = audienceData.reduce((acc, segment) => {
+                acc[segment.knowledge] = (acc[segment.knowledge] || 0) + 1;
+                return acc;
+            }, {});
+            
+            if (audienceChartInstance) {
+                audienceChartInstance.destroy();
+            }
+            audienceChartInstance = new Chart(audienceKnowledgeChartCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(knowledgeCounts),
+                    datasets: [{
+                        label: 'Number of Segments',
+                        data: Object.values(knowledgeCounts),
+                        backgroundColor: ['#60a5fa', '#facc15', '#4ade80', '#c084fc', '#f472b6', '#fb7185'],
+                        borderColor: ['#3b82f6', '#eab308', '#22c55e', '#a855f7', '#db2777', '#f43f5e'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1, color: '#4b5563'}, grid: { color: '#e5e7eb'} }, x: { ticks: { color: '#4b5563'}, grid: { display: false} } },
+                    plugins: { legend: { display: false }, title: { display: false, text: 'Audience AI Knowledge Distribution', color: '#1e3a8a' } }
+                }
+            });
+        }
+
+        if (audienceTableBody) {
+            populateAudienceFilters();
+            audienceKnowledgeFilter.addEventListener('change', populateAudienceTable);
+            audiencePersonaFilter.addEventListener('change', populateAudienceTable);
+            populateAudienceTable();
+            updateAudienceKnowledgeChart();
+        }
+
+        // Populate Pillars Accordion & Chart
+        function populatePillars() {
+            if (!pillarsAccordionContainer || !pillarsChartCtx) return;
+
+            const pillarTopicCounts = contentPillarDetails.map(p => p.clusters.length);
+            if (pillarChartInstance) {
+                pillarChartInstance.destroy();
+            }
+            pillarChartInstance = new Chart(pillarsChartCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: contentPillarDetails.map(p => p.pillarName),
+                    datasets: [{
+                        label: 'Topic Clusters per Pillar',
+                        data: pillarTopicCounts,
+                        backgroundColor: ['#38bdf8', '#fbbf24', '#34d399', '#a78bfa', '#f472b6'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { position: 'top', labels: { color: '#4b5563', padding: 10 } }, 
+                        title: { display: false, text: 'Content Pillar Breadth', color: '#1e3a8a' } 
+                    } 
+                }
+            });
+
+            pillarsAccordionContainer.innerHTML = ''; // Clear existing
+            contentPillarDetails.forEach((pillarData, index) => {
+                const overview = pillarOverviews.find(po => po.name === pillarData.pillarName);
+                const accordionItem = document.createElement('div');
+                accordionItem.className = 'content-card';
+                
+                let clustersHtml = '<div class="space-y-3 mt-3">';
+                pillarData.clusters.forEach(cluster => {
+                    clustersHtml += `
+                        <div class="p-3 border border-stone-200 rounded-md bg-stone-50">
+                            <h5 class="font-semibold text-sky-700">${cluster.name}</h5>
+                            <p class="text-xs text-stone-500 mb-1">Target Audience: ${cluster.audience}</p>
+                            <div class="text-sm text-stone-600">
+                                ${cluster.articles.length > 0 ? `<p class="font-medium mt-1">Sample Articles:</p><ul class="list-disc list-inside pl-4 text-xs">${cluster.articles.map(a => `<li>${a}</li>`).join('')}</ul>` : ''}
+                                ${cluster.tutorials.length > 0 ? `<p class="font-medium mt-1">Sample Tutorials:</p><ul class="list-disc list-inside pl-4 text-xs">${cluster.tutorials.map(t => `<li>${t}</li>`).join('')}</ul>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                clustersHtml += '</div>';
+
+                let resourceTableHtml = '';
+                if (pillarData.pillarName === "Curated AI Learning Resources") {
+                    resourceTableHtml = `
+                        <div class="mt-6">
+                            <h4 class="text-lg font-semibold text-sky-700 mb-3">Interactive Learning Resources Table (from Table 3)</h4>
+                            <p class="mb-4 text-sm text-stone-600">The table below offers a comparative overview of various AI learning resources. Filter by resource type to narrow your search.</p>
+                            <div class="mb-4">
+                                <label for="resourceTypeFilter_${index}" class="block text-sm font-medium text-stone-700 mb-1">Filter by Resource Type:</label>
+                                <select id="resourceTypeFilter_${index}" class="filter-input w-full md:w-1/2 resource-type-filter">
+                                    <option value="all">All Types</option>
+                                    <option value="Book">Book</option>
+                                    <option value="Course">Course</option>
+                                    <option value="Tool">Tool</option>
+                                </select>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table id="resourcesTable_${index}" class="w-full table resources-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Resource Type</th>
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            <th>Best For</th>
+                                            <th>Key Features/Pros</th>
+                                            <th>Cons/Limitations</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                accordionItem.innerHTML = `
+                    <button class="accordion-button w-full text-left p-4 font-semibold text-xl text-sky-700 hover:bg-sky-50 flex justify-between items-center rounded-t-md">
+                        <span>${pillarData.pillarName}</span>
+                        <svg class="w-5 h-5 transform transition-transform duration-300 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content p-4 border-t border-stone-200 bg-white rounded-b-md">
+                        <p class="mb-4 text-stone-600">${overview ? overview.description : 'Detailed information about this pillar.'}</p>
+                        <h4 class="font-medium text-sky-600 mb-2">Topic Clusters & Content Ideas (from Table 2):</h4>
+                        ${clustersHtml}
+                        ${resourceTableHtml}
+                    </div>
+                `;
+                pillarsAccordionContainer.appendChild(accordionItem);
+
+                if (pillarData.pillarName === "Curated AI Learning Resources") {
+                    const filterEl = document.getElementById(`resourceTypeFilter_${index}`);
+                    const tableBodyEl = document.querySelector(`#resourcesTable_${index} tbody`);
+                    if(filterEl && tableBodyEl) {
+                        filterEl.addEventListener('change', () => populateResourcesTable(filterEl.value, tableBodyEl));
+                        populateResourcesTable('all', tableBodyEl);
+                    }
+                }
+            });
+
+            document.querySelectorAll('.accordion-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    button.classList.toggle('open');
+                    const icon = button.querySelector('svg');
+                    icon.classList.toggle('rotate-180');
+                });
+            });
+        }
+        populatePillars();
+
+        // Populate Learning Resources Table (generic function, used by Curated Resources pillar)
+        function populateResourcesTable(filterValue = 'all', tableBodyElement) {
+            if (!tableBodyElement) return;
+            tableBodyElement.innerHTML = '';
+            const filteredData = filterValue === 'all' ? learningResourcesData : learningResourcesData.filter(res => res.type === filterValue);
+            filteredData.forEach(res => {
+                const row = tableBodyElement.insertRow();
+                row.innerHTML = `
+                    <td class="py-2 px-3 text-sm">${res.type}</td>
+                    <td class="py-2 px-3 text-sm">${res.name}</td>
+                    <td class="py-2 px-3 text-sm">${res.description}</td>
+                    <td class="py-2 px-3 text-sm">${res.bestFor}</td>
+                    <td class="py-2 px-3 text-sm">${res.features}</td>
+                    <td class="py-2 px-3 text-sm">${res.cons}</td>
+                    <td class="py-2 px-3 text-sm">${res.price}</td>
+                `;
+            });
+        }
+
+        // Populate SEO Keywords Table & Filter
+        function populateSeoKeywords() {
+            if(!seoKeywordsTableBody || !seoKeywordFilter) return;
+
+            const seoThemes = [...new Set(seoKeywordsData.map(item => item.theme))];
+            seoKeywordFilter.innerHTML = '<option value="all">All Themes</option>'; // Clear and add default
+            seoThemes.forEach(theme => {
+                const option = document.createElement('option');
+                option.value = theme;
+                option.textContent = theme;
+                seoKeywordFilter.appendChild(option);
+            });
+
+            function renderSeoTable(filterValue = 'all') {
+                seoKeywordsTableBody.innerHTML = '';
+                const filteredData = filterValue === 'all' ? seoKeywordsData : seoKeywordsData.filter(item => item.theme === filterValue);
+                filteredData.forEach(item => {
+                    const row = seoKeywordsTableBody.insertRow();
+                    row.innerHTML = `
+                        <td class="py-2 px-3 text-sm">${item.theme}</td>
+                        <td class="py-2 px-3 text-sm">${item.longTail}</td>
+                        <td class="py-2 px-3 text-sm">${item.question}</td>
+                        <td class="py-2 px-3 text-sm">${item.pillars}</td>
+                        <td class="py-2 px-3 text-sm">${item.intent}</td>
+                    `;
+                });
+            }
+            seoKeywordFilter.addEventListener('change', (e) => renderSeoTable(e.target.value));
+            renderSeoTable();
+        }
+        populateSeoKeywords();
+
+    });
+</script>
+</body>
+</html>
+
